@@ -151,8 +151,9 @@ Fonte: /costs.
 
 **Correção.**
 - Agentes próprios: defina `model: haiku` ou `model: sonnet` no cabeçalho do arquivo em `~/.claude/agents/` ou `.claude/agents/`.
-- Agente de busca embutido: um agente próprio chamado `Explore` com `model: haiku` substitui o embutido.
-- Padrão para os demais: variável `CLAUDE_CODE_SUBAGENT_MODEL` (por exemplo `sonnet`), no bloco `env` do settings.json. Sozinha ela não muda os agentes embutidos `Explore` e `Plan`; com `CLAUDE_CODE_SUBAGENT_MODEL_FORCE=1` ela vale para todos.
+- A opção mais transparente é o ajudante do kit (`ajudante-haiku`): ele só tem ferramentas de leitura, aparece com o próprio nome na tela e vem com um aviso ao fim da resposta. Veja a seção "O ajudante no Haiku" do SKILL.md.
+- Agente de busca embutido: um agente próprio chamado `Explore` com `model: haiku` substitui o embutido. Avise a pessoa de que o nome na tela continua o mesmo, então ela não vê que o modelo mudou.
+- Padrão para os demais, também sem aviso na tela: variável `CLAUDE_CODE_SUBAGENT_MODEL` (por exemplo `sonnet`), no bloco `env` do settings.json. Sozinha ela não muda os agentes embutidos `Explore` e `Plan`; com `CLAUDE_CODE_SUBAGENT_MODEL_FORCE=1` ela vale para todos.
 - Ordem de prioridade: o modelo pedido na chamada, depois o do arquivo do agente, depois a variável, depois o modelo da conversa.
 - Times de agentes gastam cerca de sete vezes mais que uma sessão comum. Use só quando o paralelismo compensar.
 

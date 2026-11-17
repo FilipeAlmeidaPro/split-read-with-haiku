@@ -73,6 +73,15 @@ Duas ferramentas extras:
 
 A entrega é um plano com no máximo três mudanças. Cada uma diz onde clicar e o que observar em Configurações > Uso na semana seguinte. As correções do chat, com o caminho de cada clique, estão em `references/modo-chat.md`.
 
+## O ajudante no Haiku
+
+O kit traz também um ajudante de leitura que roda no Haiku e um aviso com números ao fim de cada resposta. Os dois só existem no Claude Code. O ajudante tem apenas ferramentas de leitura e busca; o modelo da conversa não é alterado.
+
+- Para saber se estão instalados: `python3 ~/.claude/kit-economia-de-tokens/configurar.py estado`.
+- Quando a pessoa perguntar quanto o ajudante economizou: `python3 ~/.claude/kit-economia-de-tokens/resumo_do_pedido.py --sessao`. Sem `--sessao`, o resultado é o do último pedido.
+- Quando a auditoria mostrar subagentes ou buscas pesando no modelo caro e o ajudante não estiver instalado, indique a instalação como correção. Diga o que ela muda (um arquivo de agente, um bloco no CLAUDE.md e um hook) e como remover.
+- Para remover: `bash ~/.claude/kit-economia-de-tokens/desinstalar.sh`.
+
 ## Formato da resposta
 
 ```

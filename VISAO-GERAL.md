@@ -1,6 +1,6 @@
 # Visão geral: o que é o quê
 
-Este arquivo separa três coisas que costumam ser misturadas: o que o Claude já faz sozinho, o que a skill `auditoria-de-tokens` é, e o que ela não é.
+Este arquivo separa quatro coisas: o que o Claude já faz sozinho, o que cada peça do kit é, o que muda no Claude de quem instala e o que o kit não é.
 
 ## 1. O que o Claude já tem, sem instalar nada
 
@@ -10,72 +10,80 @@ Este arquivo separa três coisas que costumam ser misturadas: o que o Claude já
 | `/context` | Claude Code | O que ocupa o contexto da sessão aberta. | Só a sessão atual. |
 | Configurações > Uso | Chat e app | Quanto resta da janela de cinco horas e do limite semanal. | Não diz o que gastou. |
 | Skill embutida `explain-usage` | App desktop, em algumas instalações | Um gráfico de para onde foram os tokens da sessão atual. | Uma sessão só, sem correção, com pesos aproximados. |
-| Controles: `/model`, `/effort`, `/clear`, `/compact`; no chat, o seletor de modelo e de esforço | Claude Code e chat | São os botões que de fato reduzem o gasto. | O Claude não aperta nenhum deles sozinho. |
-| Automatismos: cache, carga adiada de ferramentas MCP, compactação quando o contexto enche | Claude Code | Barateiam a releitura e evitam que a conversa estoure. | Não escolhem modelo mais barato, não baixam o esforço e não limpam a conversa entre tarefas. |
+| Ajudantes (subagentes) | Claude Code | O Claude já abre ajudantes para buscas e tarefas paralelas. | Por padrão eles rodam no mesmo modelo da conversa, ou seja, no mais caro. |
+| Controles: `/model`, `/effort`, `/clear`, `/compact` | Claude Code | São os botões que reduzem o gasto. | O Claude não aperta nenhum deles sozinho. |
 
-Resumo: o Claude já mede a sessão atual e já tem todos os botões. Ele não diz qual botão apertar no seu caso.
+Resumo: o Claude já mede a sessão atual, já tem ajudantes e já tem todos os botões. Ele não manda o trabalho braçal para o modelo barato e não diz qual botão apertar no seu caso.
 
-## 2. O que a skill é
+## 2. As três peças do kit
 
-Uma pasta com instruções e três programas pequenos. Nada além disso.
+### Ajudante no Haiku (faz)
 
-| Arquivo | O que é |
-|---|---|
-| `SKILL.md` | As instruções que o Claude segue: medir primeiro, entregar três mudanças, dizer o que não é problema. |
-| `scripts/auditar_claude_code.py` | Lê as configurações e até 30 dias de registros de sessão do Claude Code e calcula para onde o custo foi. |
-| `scripts/analisar_export_chat.py` | Lê o histórico exportado do chat e mostra quais conversas mais pesaram. |
-| `scripts/estimar_arquivo.py` | Estima quanto um arquivo pesa antes de ser anexado. |
-| `references/correcoes.md` | Para cada problema, a correção exata, o que se perde e como desfazer. |
-| `references/modo-chat.md` | A entrevista e as correções do chat, com o caminho dos cliques. |
-| `references/como-os-tokens-sao-gastos.md` | A explicação do porquê, com a tabela de preços e as fontes. |
-| `references/exemplos.md` | Exemplos de resposta nos dois modos. |
+- **O que é:** um arquivo de agente, `ajudante-haiku.md`, mais um bloco de regras no `CLAUDE.md`.
+- **O que faz:** quando uma busca pede três ou mais passos, o Claude chama esse ajudante, que roda no Haiku. O Haiku custa cerca de 40 vezes menos que o Opus.
+- **Onde:** só no Claude Code.
 
-Para usar, a pessoa escreve "audite meus tokens". O Claude roda o programa, lê o resultado e responde neste formato:
+### Aviso ao fim da resposta (mostra)
 
-1. Resumo em três linhas: quanto foi gasto, onde foi parar e a causa principal.
-2. As três mudanças de maior impacto. Cada uma traz o número da pessoa, a ação exata, o que ela perde e o ganho esperado.
-3. O que não é problema no caso dela.
-4. Como conferir, uma semana depois, se funcionou.
+- **O que é:** um programa pequeno, `resumo_do_pedido.py`, ligado a um hook `Stop`.
+- **O que faz:** depois de cada resposta em que houve delegação, imprime quanto foi lido pelo Haiku, o ganho e quanto ficou com o modelo da conversa. Não gasta tokens do modelo.
+- **Onde:** só no Claude Code.
 
-## 3. O que a skill não é
+### Auditoria de tokens (indica)
 
-- **Não troca de modelo sozinha.** A conversa principal do Claude Code não muda de modelo por conta própria, e nenhuma skill consegue fazer isso. A skill mostra onde o modelo caro está sobrando; quem troca é a pessoa.
-- **Não economiza nada só por estar instalada.** Ela é um diagnóstico. A economia vem das mudanças que a pessoa aplica depois.
-- **Não mexe em configuração sem confirmação.** Os programas só leem. Qualquer edição é mostrada antes e tem backup.
-- **Não calcula o limite do plano.** A fórmula não é pública. Os percentuais usam os preços públicos da API para comparar causas entre si.
+- **O que é:** uma skill com três programas que só leem.
+- **O que faz:** olha até 30 dias de uso, ordena as causas por custo e entrega as três mudanças de maior impacto, com o número de cada uma e com o que não é problema no caso da pessoa.
+- **Onde:** no Claude Code e no chat. No chat, ela lê o histórico exportado.
+
+## 3. O que muda no Claude de quem instala
+
+| | Muda? | Detalhe |
+|---|---|---|
+| O modelo da conversa | Não | Quem pensa, responde, decide e edita continua sendo o modelo que a pessoa escolheu. |
+| Quem procura e lê | Sim | Buscas de três ou mais passos vão para o ajudante no Haiku. |
+| O que o ajudante consegue fazer | Só ler | Ele tem três ferramentas: ler arquivo, buscar texto e buscar arquivo por nome. Sem terminal e sem edição. |
+| O que aparece na tela | Sim | O nome `ajudante-haiku` em cada delegação, uma linha de observação no fim da resposta e o aviso com números. |
+| Arquivos de configuração | Dois | Um bloco marcado no `CLAUDE.md` e um hook no `settings.json`, os dois com cópia de segurança. |
+
+Para desligar em uma sessão, a pessoa diz "sem ajudante". Para remover tudo, roda `bash ~/.claude/kit-economia-de-tokens/desinstalar.sh`. O aviso lembra desse comando na primeira vez e depois a cada dez avisos.
+
+## 4. O que o kit não é
+
+- **Não troca o modelo da conversa.** Nem escondido, nem no meio da tarefa.
+- **Não usa o Sonnet de forma automática.** O Sonnet custa metade do Opus, e delegar edição a um modelo menor é um risco que o kit evita. Ele continua como escolha manual da pessoa, com `/model sonnet`.
+- **Não substitui os ajudantes embutidos do Claude.** Trocar o modelo deles funcionaria, mas o nome na tela continuaria o mesmo e a pessoa não veria a mudança.
+- **Não garante que toda busca será delegada.** A regra é uma instrução para o modelo, que a segue na maioria das vezes.
+- **Não calcula o limite do plano.** A fórmula não é pública. Os valores usam os preços públicos da API para comparar.
 - **Não lê o texto das conversas.** Só tamanhos, contagens e nomes de modelos, ferramentas e pastas.
-- **Não é gratuita em tokens.** Instalada e parada, custa cerca de 50 tokens por sessão. Uma auditoria completa gasta alguns milhares.
+- **Não funciona no chat nem no Codex,** no caso do ajudante e do aviso. No chat valem a auditoria e o guia.
 
-## 4. Por que vale ter mesmo assim
+## 5. Por que vale ter
 
-- **Histórico em vez de uma sessão.** Padrões como "a maior parte do custo vem de conversas acima de 150 mil tokens" só aparecem olhando semanas de uso.
-- **Causa e correção juntas.** Cada achado vem com o comando ou o clique exato, o custo da mudança e o caminho de volta.
-- **Ordem de prioridade.** As causas saem ordenadas por custo, então a pessoa começa pela que mais rende.
-- **Descarta o que não se aplica.** A seção "o que não é problema" evita que a pessoa perca tempo arrumando o que quase não pesa.
-- **Cobre o chat com dados.** O histórico exportado mostra quais conversas pesaram. Não encontramos nada embutido que faça isso.
+- **O trabalho braçal sai do modelo caro.** Cada passo de busca feito pelo Opus relê a conversa inteira no preço do Opus. O ajudante faz os mesmos passos com um contexto pequeno, no preço do Haiku.
+- **A conversa principal cresce menos.** O ajudante lê os arquivos e devolve só os achados.
+- **A pessoa vê o que aconteceu.** Nome na tela, observação e números ao fim de cada resposta.
+- **A auditoria prova ou desmente.** Ela mostra quanto do custo estava em cada modelo antes e depois, e aponta as outras causas, como conversa longa.
 
-## 5. Como ela resolve o "não sei qual modelo usar"
-
-A dúvida costuma ser respondida com uma regra genérica. A skill responde com os números de quem perguntou.
-
-Ela mostra quanto do custo foi em cada modelo, quantos pedidos feitos no modelo caro eram tarefas curtas e quanto os subagentes gastaram herdando esse modelo. Com isso a recomendação sai específica, por exemplo: Sonnet como padrão, Opus só nas sessões de arquitetura, subagentes de busca no Haiku. Cada troca vem com o ganho estimado e com o que se perde.
-
-Ela também mostra quando o modelo não é o problema. Às vezes o que pesa é a conversa que nunca é limpa, e trocar de modelo resolveria pouco. Como as causas saem ordenadas por custo, a pessoa vê isso antes de mexer no que não importa.
-
-A regra que sobra para o dia a dia é curta:
+## 6. Qual modelo para quê
 
 | Modelo | Quando | Custo em relação ao Opus |
 |---|---|---|
-| Haiku | Trabalho mecânico: formatar, extrair, buscar, resumir | Cerca de 40 vezes menor |
-| Sonnet | Padrão: escrever, revisar, analisar, programar | Metade |
-| Opus | Difícil: problema sem caminho claro, arquitetura, decisão cara | Referência |
+| Haiku | Trabalho mecânico: procurar, ler, listar. É o que o ajudante faz. | Cerca de 40 vezes menor |
+| Sonnet | Sessões do dia a dia, por escolha da pessoa | Metade |
+| Opus | Raciocínio, decisão e edição | Referência |
 | Fable | No plano Pro, só com créditos de uso, cobrados à parte | O dobro |
 
-Troque de modelo no início da sessão. Trocar no meio de uma conversa grande faz o contexto inteiro ser regravado.
+## 7. Estado atual
 
-## 6. Estado atual
+Testado:
 
-- O modo Claude Code foi testado em uma máquina, com dados reais.
-- O leitor do histórico do chat só foi testado com dados sintéticos.
-- Os caminhos de menu do chat vieram das páginas de ajuda e não foram conferidos na interface.
-- Windows não foi testado.
+- **Auditoria:** em uma máquina, com dados reais.
+- **Instalação e remoção:** em uma pasta de teste com arquivos já existentes. Reinstalar não duplica nada, e remover devolve o `CLAUDE.md` e o `settings.json` ao conteúdo original.
+- **Leitura no Haiku:** uma rodada com as instruções do ajudante. Ele acertou três buscas e respondeu "não encontrei" na que não existia.
+- **Aviso com números:** calculado sobre uma sessão real em que o Haiku fez a leitura.
+
+Ainda não testado:
+
+- **O kit instalado em uma sessão real.** Falta ver o Claude delegando por causa da nota e o aviso aparecendo na tela.
+- **A trava de ferramentas do ajudante.** Ela segue a documentação do Claude Code, mas não foi executada.
+- **O leitor do histórico do chat com uma exportação real,** os caminhos de menu do chat e o Windows.
