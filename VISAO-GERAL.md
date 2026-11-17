@@ -78,12 +78,12 @@ Para desligar em uma sessão, a pessoa diz "sem ajudante". Para remover tudo, ro
 Testado:
 
 - **Auditoria:** em uma máquina, com dados reais.
-- **Instalação e remoção:** em uma pasta de teste com arquivos já existentes. Reinstalar não duplica nada, e remover devolve o `CLAUDE.md` e o `settings.json` ao conteúdo original.
-- **Leitura no Haiku:** uma rodada com as instruções do ajudante. Ele acertou três buscas e respondeu "não encontrei" na que não existia.
-- **Aviso com números:** calculado sobre uma sessão real em que o Haiku fez a leitura.
+- **Instalação e remoção:** em uma pasta de teste com arquivos já existentes e em uma instalação real. Reinstalar não duplica nada, e remover devolve o `CLAUDE.md` e o `settings.json` ao conteúdo original.
+- **O ajudante instalado:** em uma sessão real, ele rodou no Haiku, usou só busca e leitura, acertou três buscas e respondeu "não encontrei" na que não existia. Quando recebeu o pedido de criar um arquivo, não conseguiu, porque não tem ferramenta de escrita nem de terminal.
+- **Aviso com números:** o hook rodou sem erro em uma sessão real, e o texto apareceu na tela ao fim da resposta, no app desktop.
 
 Ainda não testado:
 
-- **O kit instalado em uma sessão real.** Falta ver o Claude delegando por causa da nota e o aviso aparecendo na tela.
-- **A trava de ferramentas do ajudante.** Ela segue a documentação do Claude Code, mas não foi executada.
+- **Delegação espontânea.** Falta ver, em uma sessão nova, o Claude chamando o ajudante por causa da nota do `CLAUDE.md`, sem ninguém pedir.
+- **O aviso no terminal e nas extensões de IDE.** Só foi visto no app desktop.
 - **O leitor do histórico do chat com uma exportação real,** os caminhos de menu do chat e o Windows.
