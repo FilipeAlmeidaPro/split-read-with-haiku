@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Para onde vão os seus tokens</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  @page { size: A4; margin: 0; }
+  :root {
+    --tinta: #14213D;
+    --papel: #FFFFFF;
+    --marca: #FFD60A;
+    --caro: #D62839;
+    --apoio: #56627A;
+    --grade: #DDE4F0;
+    --fundo: #F3F6FB;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { background: #C9D1DE; color: var(--tinta); font-family: "Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif; font-size: 9.6pt; line-height: 1.42; }
+  .pagina { width: 210mm; height: 297mm; padding: 13mm 14mm 11mm; background: var(--papel); margin: 0 auto; position: relative; overflow: hidden; page-break-after: always; display: flex; flex-direction: column; }
+  .pagina:last-child { page-break-after: auto; }
+  @media screen { .pagina { margin: 8mm auto; box-shadow: 0 2mm 8mm rgba(20,33,61,.25); } }
+  body.so1 .p2, body.so2 .p1 { display: none; }
+  body.so1, body.so2 { background: var(--papel); }
+  body.so1 .pagina, body.so2 .pagina { margin: 0; box-shadow: none; }
+
+  h1, h2, h3 { font-family: "Avenir Next Condensed", "Avenir Next", "Arial Narrow", sans-serif; font-weight: 800; letter-spacing: -0.01em; }
+  h1 { font-size: 44pt; line-height: 0.92; }
+  .p2 h1 { font-size: 36pt; }
+  h2 { font-size: 17pt; line-height: 1.05; margin-bottom: 2.2mm; }
+  h3 { font-size: 12.5pt; line-height: 1.1; margin-bottom: 1mm; }
+  p + p { margin-top: 1.4mm; }
+  .apoio { color: var(--apoio); }
+  mark { background: linear-gradient(transparent 12%, var(--marca) 12%, var(--marca) 92%, transparent 92%); color: inherit; padding: 0 .6mm; }
+  code { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 8.6pt; background: var(--fundo); border: .25mm solid var(--grade); border-radius: 1mm; padding: .1mm 1.2mm; white-space: nowrap; }
+
+  .topo { display: flex; justify-content: space-between; align-items: flex-end; gap: 8mm; padding-bottom: 5mm; border-bottom: .9mm solid var(--tinta); }
+  .topo .lado { width: 54mm; font-size: 9pt; flex: none; }
+
+  /* Página 1: o gráfico */
+  .titulo-grafico { padding-top: 5mm; margin-bottom: 0; font-size: 19pt; }
+  .relê { display: flex; gap: 9mm; padding: 3mm 0 5mm; }
+  .grafico { width: 108mm; flex: none; }
+  .area { height: 80mm; position: relative; display: flex; align-items: flex-end; justify-content: space-around; padding: 0 4mm;
+          background-image: linear-gradient(var(--grade) .25mm, transparent .25mm); background-size: 100% 10mm; background-position: bottom; border-bottom: .6mm solid var(--tinta); }
+  .col { width: 25mm; display: flex; flex-direction: column; align-items: stretch; }
+  .col .total { font-family: "Avenir Next Condensed", sans-serif; font-weight: 800; font-size: 13pt; text-align: center; margin-bottom: 1mm; line-height: 1; }
+  .col .total small { display: block; font-family: "Avenir Next", sans-serif; font-weight: 500; font-size: 7.4pt; color: var(--apoio); margin-top: .6mm; }
+  .seg { width: 100%; }
+  .novo { height: 1.4mm; background: var(--marca); }
+  .hist { background: var(--tinta); }
+  .base { height: 5.4mm; background: repeating-linear-gradient(135deg, var(--tinta) 0 .35mm, #fff .35mm 1.5mm); border: .3mm solid var(--tinta); }
+  .eixo { display: flex; justify-content: space-around; padding: 1.6mm 4mm 0; font-weight: 600; font-size: 9pt; }
+  .eixo span { width: 25mm; text-align: center; }
+  .legenda { display: flex; gap: 4.5mm; margin-top: 3mm; font-size: 8pt; white-space: nowrap; }
+  .legenda i { display: inline-block; width: 4mm; height: 2.6mm; margin-right: 1.3mm; vertical-align: -0.3mm; }
+  .explica { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 3.4mm; }
+  .explica .grande { font-family: "Avenir Next Condensed", sans-serif; font-weight: 700; font-size: 19pt; line-height: 1.08; }
+
+  .quatro { display: grid; grid-template-columns: 1fr 1fr; gap: 0 9mm; border-top: .9mm solid var(--tinta); padding-top: 4.5mm; }
+  .quatro > h2 { grid-column: 1 / -1; margin-bottom: 3mm; }
+  .fator { padding: 3mm 0 3.4mm; border-top: .25mm solid var(--grade); }
+  .fator:nth-of-type(1), .fator:nth-of-type(2) { border-top: 0; padding-top: 0; }
+  .precos { margin-top: 1.6mm; display: grid; grid-template-columns: 13mm 1fr; row-gap: 1mm; align-items: center; font-size: 8.4pt; }
+  .precos b { font-weight: 600; }
+  .barra { height: 3.2mm; background: var(--tinta); position: relative; }
+  .barra span { position: absolute; left: calc(100% + 1.5mm); top: -0.5mm; white-space: nowrap; color: var(--apoio); }
+  .barra.fable { background: var(--caro); height: 4.4mm; }
+  .barra.fable span { position: static; color: #fff; font-weight: 600; line-height: 4.4mm; padding-left: 1.6mm; display: block; }
+
+  .plano { margin-top: auto; background: var(--fundo); border-left: 1.6mm solid var(--tinta); padding: 3.6mm 5mm; display: grid; grid-template-columns: 31mm 1fr 1fr; gap: 6mm; align-items: start; }
+  .plano h3 { margin: 0; font-size: 14pt; }
+  .plano p { font-size: 9pt; }
+
+  /* Página 2 */
+  .duas { display: grid; grid-template-columns: 1fr 1fr; gap: 0 9mm; padding-top: 5mm; }
+  .duas h2 { padding-bottom: 1.6mm; border-bottom: .5mm solid var(--tinta); margin-bottom: 0; }
+  .acao { padding: 2.5mm 0 2.6mm; border-bottom: .25mm solid var(--grade); }
+  .acao b { font-weight: 700; font-size: 10.2pt; display: block; line-height: 1.22; margin-bottom: .5mm; }
+  .acao p { font-size: 8.9pt; line-height: 1.36; }
+  .modelos { margin-top: 5mm; border-top: .9mm solid var(--tinta); padding-top: 4mm; }
+  .tres { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7mm; }
+  .tres p { font-size: 8.9pt; }
+  .tres h3 span { font-family: "Avenir Next", sans-serif; font-weight: 500; font-size: 8.4pt; color: var(--apoio); margin-left: 1.5mm; }
+  .passagem { margin-top: 5mm; background: var(--tinta); color: #fff; padding: 4.4mm 5.5mm 4.8mm; display: grid; grid-template-columns: 52mm 1fr; gap: 7mm; align-items: center; }
+  .conferir { margin-top: 5mm; display: grid; grid-template-columns: 52mm 1fr 1fr; gap: 7mm; align-items: start; }
+  .conferir h2 { margin: 0; }
+  .conferir p { font-size: 8.9pt; }
+  .passagem h2 { color: var(--marca); margin-bottom: 1.5mm; }
+  .passagem p { font-size: 8.9pt; }
+  .passagem .prompt { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 8.1pt; line-height: 1.5; background: rgba(255,255,255,.09); border-left: .8mm solid var(--marca); padding: 2.6mm 3.6mm; }
+  .rodape { margin-top: auto; padding-top: 3mm; border-top: .25mm solid var(--grade); display: flex; justify-content: space-between; gap: 8mm; font-size: 7.6pt; color: var(--apoio); line-height: 1.35; }
+  .rodape div:first-child { color: var(--tinta); font-size: 8.8pt; max-width: 92mm; }
+</style>
+</head>
+<body>
+
+<section class="pagina p1">
+  <header class="topo">
+    <h1>Para onde vão<br>os seus tokens</h1>
+    <p class="lado">Guia de duas páginas para fazer o limite do Claude render mais. Vale para o chat e para o Claude Code, no plano Pro.</p>
+  </header>
+
+  <h2 class="titulo-grafico">A cada mensagem, o Claude relê a conversa inteira</h2>
+  <div class="relê">
+    <div class="grafico">
+      <div class="area">
+        <div class="col"><div class="total">12 mil<small>tokens lidos</small></div><div class="seg novo"></div><div class="seg base"></div></div>
+        <div class="col"><div class="total">57 mil<small>tokens lidos</small></div><div class="seg novo"></div><div class="seg hist" style="height:19.8mm"></div><div class="seg base"></div></div>
+        <div class="col"><div class="total">152 mil<small>tokens lidos</small></div><div class="seg novo"></div><div class="seg hist" style="height:63mm"></div><div class="seg base"></div></div>
+      </div>
+      <div class="eixo"><span>Mensagem 1</span><span>Mensagem 10</span><span>Mensagem 30</span></div>
+      <div class="legenda">
+        <span><i style="background:var(--marca)"></i>Sua pergunta</span>
+        <span><i style="background:var(--tinta)"></i>Histórico, anexos e respostas</span>
+        <span><i class="base" style="height:2.6mm"></i>Carga inicial</span>
+      </div>
+    </div>
+    <div class="explica">
+      <p class="grande">A pergunta tem o mesmo tamanho. O que cresce é o que vai junto com ela.</p>
+      <p>O modelo não guarda nada entre uma mensagem e outra. Ele recebe tudo de novo: instruções, lista de ferramentas, histórico, arquivos anexados e, no fim, a sua pergunta.</p>
+      <p><mark>A mensagem 30 custa mais de dez vezes a mensagem 1.</mark></p>
+      <p class="apoio">Exemplo de uma conversa com um PDF anexado. No Claude Code, um único pedido vira várias chamadas, e cada uma relê tudo.</p>
+    </div>
+  </div>
+
+  <div class="quatro">
+    <h2>Quatro coisas decidem o seu gasto</h2>
+    <div class="fator">
+      <h3>O tamanho da conversa</h3>
+      <p>É o que mais pesa para quase todo mundo. Conversa que dura dias, com dezenas de mensagens, relê tudo a cada pergunta. <mark>Assunto novo, conversa nova.</mark></p>
+      <p>Na mesma tarefa, depois de 15 a 20 mensagens, leve um resumo para uma conversa nova. O modelo de resumo está no verso.</p>
+    </div>
+    <div class="fator">
+      <h3>O modelo</h3>
+      <p>O mesmo pedido tem quatro preços. Custo por token na tabela da API:</p>
+      <div class="precos">
+        <b>Haiku</b><div class="barra" style="width:1.3%"><span>40 vezes mais barato que o Opus</span></div>
+        <b>Sonnet</b><div class="barra" style="width:25%"><span>metade do Opus</span></div>
+        <b>Opus</b><div class="barra" style="width:50%"><span>padrão do Claude Code</span></div>
+        <b>Fable</b><div class="barra fable" style="width:100%"><span>o dobro do Opus; no Pro, só com créditos</span></div>
+      </div>
+    </div>
+    <div class="fator">
+      <h3>O raciocínio</h3>
+      <p>O que o modelo escreve custa cinco vezes o que ele lê, e o raciocínio conta como escrita. Esforço alto faz o modelo pensar muito até em pedido simples.</p>
+    </div>
+    <div class="fator">
+      <h3>O que entra junto</h3>
+      <p>Um PDF usa de 1.500 a 3.000 tokens por página e é relido a cada mensagem. Conectores, skills e plugins ligados ocupam espaço em toda conversa, mesmo sem uso.</p>
+    </div>
+  </div>
+
+  <div class="plano">
+    <h3>O seu plano Pro</h3>
+    <p>Tem um limite por janela de cinco horas e um limite semanal. <b>O chat, o Claude Code e o app desktop gastam do mesmo limite.</b> Acompanhe em Configurações &gt; Uso.</p>
+    <p>Inclui Opus, Sonnet e Haiku. <b>O Fable não entra no limite:</b> desde 17/11/2026 ele só roda com créditos de uso, cobrados à parte. Defina um teto mensal em Configurações &gt; Uso.</p>
+  </div>
+</section>
+
+<section class="pagina p2">
+  <header class="topo">
+    <h1>O que fazer</h1>
+    <p class="lado">Cinco hábitos para cada lugar. Comece pelo primeiro de cada coluna: é o que mais rende.</p>
+  </header>
+
+  <div class="duas">
+    <div>
+      <h2>No chat</h2>
+      <div class="acao"><b>Assunto novo, conversa nova</b><p>Depois de 15 a 20 mensagens na mesma tarefa, peça o resumo de passagem (abaixo) e continue em outra conversa.</p></div>
+      <div class="acao"><b>Sonnet no dia a dia, esforço médio</b><p>Clique no nome do modelo, ao lado do botão de enviar. Em Esforço, escolha o nível médio. Opus só para o que é difícil.</p></div>
+      <div class="acao"><b>Arquivo que volta sempre vai para um Projeto</b><p>O conteúdo de Projetos fica em cache e conta menos quando é reutilizado. Fora disso, anexe só as páginas que importam.</p></div>
+      <div class="acao"><b>Um pedido completo em vez de cinco picados</b><p>Diga objetivo, público, formato e restrições de uma vez. Cada correção depois relê a conversa inteira.</p></div>
+      <div class="acao"><b>Conectores e Research só quando for usar</b><p>Em + &gt; Conectores &gt; Acesso a ferramentas, desligue os que não vai usar naquela conversa. O Research consome o limite bem mais rápido.</p></div>
+    </div>
+    <div>
+      <h2>No Claude Code</h2>
+      <div class="acao"><b>Limpe a conversa ao trocar de tarefa</b><p><code>/clear</code> começa do zero e não custa nada. Antes, peça para gravar o estado em um arquivo. <code>/compact</code> resume sem sair da conversa.</p></div>
+      <div class="acao"><b>Sonnet como padrão</b><p><code>/model sonnet</code>. O padrão do plano é o Opus, que custa o dobro. Troque de modelo no início da sessão: trocar no meio regrava o contexto inteiro.</p></div>
+      <div class="acao"><b>Esforço médio</b><p><code>/effort medium</code>. Quando um pedido precisar de raciocínio profundo, escreva <code>ultrathink</code> nele.</p></div>
+      <div class="acao"><b>Veja o que ocupa espaço</b><p><code>/context</code> mostra o contexto atual e <code>/usage</code> mostra o consumo. Desligue com <code>/mcp</code> e <code>/plugin</code> o que o projeto não usa. CLAUDE.md com menos de 200 linhas.</p></div>
+      <div class="acao"><b>Peça leituras pontuais</b><p>"Só a função X", "as últimas 100 linhas do log". Busca ampla e testes vão para um subagente com <code>model: haiku</code>.</p></div>
+    </div>
+  </div>
+
+  <div class="modelos">
+    <h2>Qual modelo para quê</h2>
+    <div class="tres">
+      <div><h3>Haiku<span>o mais barato</span></h3><p>Reformatar, traduzir, resumir, extrair dados, pergunta direta, tarefa repetitiva.</p></div>
+      <div><h3>Sonnet<span>o do dia a dia</span></h3><p>Escrever, revisar, analisar, programar com um objetivo claro. Dá conta da maior parte do trabalho.</p></div>
+      <div><h3>Opus<span>o do difícil</span></h3><p>Problema sem caminho claro, arquitetura, decisão que custa caro se sair errada.</p></div>
+    </div>
+  </div>
+
+  <div class="passagem">
+    <div>
+      <h2>Resumo de passagem</h2>
+      <p>Cole este pedido na conversa que ficou longa. Depois, abra uma conversa nova e comece colando a resposta.</p>
+    </div>
+    <div class="prompt">Resuma esta conversa para eu continuar em uma conversa nova. Máximo de 20 linhas: objetivo; decisões tomadas e por quê; estado atual; próximos passos; restrições que eu dei; nomes de arquivos e termos que preciso manter. Não inclua o que foi descartado.</div>
+  </div>
+
+  <div class="conferir">
+    <h2>Como saber se funcionou</h2>
+    <p><b>No chat:</b> daqui a uma semana, abra Configurações &gt; Uso no mesmo horário em que o limite costumava acabar. A janela de cinco horas deve estar mais folgada.</p>
+    <p><b>No Claude Code:</b> <code>/usage</code> mostra o consumo da sessão e o do plano. Uma sessão recém-aberta deve começar leve em <code>/context</code>.</p>
+  </div>
+
+  <footer class="rodape">
+    <div><b>Quer saber qual é o seu caso?</b> A skill auditoria-de-tokens mede o seu uso e aponta as três mudanças que mais rendem para você.</div>
+    <div>Conferido na documentação e na central de ajuda da Anthropic em 17/11/2026. Comandos, menus e preços mudam. Material independente, sem vínculo com a Anthropic.</div>
+  </footer>
+</section>
+
+<script>
+  var m = /pagina=(\d)/.exec(location.search);
+  if (m) document.body.classList.add('so' + m[1]);
+</script>
+</body>
+</html>
