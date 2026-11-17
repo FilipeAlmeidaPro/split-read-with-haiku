@@ -45,7 +45,7 @@ Resumo: o Claude já mede a sessão atual, já tem ajudantes e já tem todos os 
 | O que aparece na tela | Sim | O nome `ajudante-haiku` em cada delegação, uma linha de observação no fim da resposta e o aviso com números. |
 | Arquivos de configuração | Dois | Um bloco marcado no `CLAUDE.md` e um hook no `settings.json`, os dois com cópia de segurança. |
 
-Para desligar em uma sessão, a pessoa diz "sem ajudante". Para remover tudo, roda `bash ~/.claude/kit-economia-de-tokens/desinstalar.sh`. O aviso lembra desse comando na primeira vez e depois a cada dez avisos.
+Para desligar em uma sessão, a pessoa diz "sem ajudante". Para remover tudo, roda `bash ~/.claude/split-read-with-haiku/desinstalar.sh`. O aviso lembra desse comando na primeira vez e depois a cada dez avisos.
 
 ## 4. O que o kit não é
 

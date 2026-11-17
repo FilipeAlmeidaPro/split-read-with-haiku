@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-configurar.py - Instala e remove o kit de economia de tokens no Claude Code.
+configurar.py - Instala e remove o Split Read with Haiku no Claude Code.
 
   python3 configurar.py instalar                 # skill + ajudante + nota + aviso com números
   python3 configurar.py instalar --sem-resumo    # sem o aviso com números (não toca no settings.json)
@@ -13,12 +13,12 @@ configurar.py - Instala e remove o kit de economia de tokens no Claude Code.
 O que a instalação completa mexe, e nada além disso:
   ~/.claude/skills/auditoria-de-tokens/     pasta nova
   ~/.claude/agents/ajudante-haiku.md        arquivo novo
-  ~/.claude/kit-economia-de-tokens/         pasta nova (scripts e backups)
+  ~/.claude/split-read-with-haiku/         pasta nova (scripts e backups)
   ~/.claude/CLAUDE.md                       um bloco marcado, no fim do arquivo
   ~/.claude/settings.json                   um hook "Stop"
 
 Antes de alterar CLAUDE.md e settings.json, uma cópia vai para
-~/.claude/kit-economia-de-tokens/backups/. O modelo da conversa não é alterado.
+~/.claude/split-read-with-haiku/backups/. O modelo da conversa não é alterado.
 """
 import json
 import re
@@ -28,16 +28,16 @@ import time
 from pathlib import Path
 
 CLAUDE = Path.home() / ".claude"
-KIT = CLAUDE / "kit-economia-de-tokens"
+KIT = CLAUDE / "split-read-with-haiku"
 BACKUPS = KIT / "backups"
 SKILL = CLAUDE / "skills" / "auditoria-de-tokens"
 AGENTE = CLAUDE / "agents" / "ajudante-haiku.md"
 MEMORIA = CLAUDE / "CLAUDE.md"
 SETTINGS = CLAUDE / "settings.json"
-INICIO = "<!-- kit-economia-de-tokens:inicio -->"
-FIM = "<!-- kit-economia-de-tokens:fim -->"
-MARCA = "kit-economia-de-tokens"
-COMANDO = 'python3 "$HOME/.claude/kit-economia-de-tokens/resumo_do_pedido.py" --hook'
+INICIO = "<!-- split-read-with-haiku:inicio -->"
+FIM = "<!-- split-read-with-haiku:fim -->"
+MARCA = "split-read-with-haiku"
+COMANDO = 'python3 "$HOME/.claude/split-read-with-haiku/resumo_do_pedido.py" --hook'
 BLOCO = re.compile(r"\n*" + re.escape(INICIO) + r".*?" + re.escape(FIM) + r"\n?", re.S)
 
 
@@ -131,7 +131,7 @@ def tirar_nota():
 def instalar(args):
     origem = Path(__file__).resolve().parent
     raiz = origem.parent
-    print("Instalando o kit de economia de tokens:")
+    print("Instalando o Split Read with Haiku:")
     fonte_skill = raiz / "auditoria-de-tokens"
     if fonte_skill.is_dir():
         if SKILL.exists():
@@ -162,12 +162,12 @@ def instalar(args):
     print()
     print("O modelo da sua conversa não foi alterado.")
     print("Vale a partir da próxima sessão do Claude Code.")
-    print("Para remover: bash ~/.claude/kit-economia-de-tokens/desinstalar.sh")
+    print("Para remover: bash ~/.claude/split-read-with-haiku/desinstalar.sh")
     return 0
 
 
 def remover(args):
-    print("Removendo o kit de economia de tokens:")
+    print("Removendo o Split Read with Haiku:")
     if AGENTE.is_file():
         AGENTE.unlink()
         print("  - ajudante de leitura")

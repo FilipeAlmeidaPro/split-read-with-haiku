@@ -27,7 +27,7 @@ PRECOS = {
 }
 ESCRITA_5M, ESCRITA_1H = 1.25, 2.0
 AGENTE = "ajudante-haiku"
-PASTA_KIT = Path(os.environ.get("KIT_TOKENS_PASTA") or Path.home() / ".claude" / "kit-economia-de-tokens")
+PASTA_KIT = Path(os.environ.get("SPLIT_READ_PASTA") or Path.home() / ".claude" / "split-read-with-haiku")
 LEMBRETE_A_CADA = 10
 
 
@@ -169,11 +169,11 @@ def frase(r, sessao_inteira=False):
     if o["n"]:
         resto += f" Outros ajudantes, no modelo deles: {fmt(o['lidos'])} tokens, cerca de {dolar(o['custo'])}."
     if not a["n"]:
-        return f"Observação do kit de tokens: {onde}, nada foi delegado ao ajudante no Haiku. " + resto.replace(
+        return f"Observação (Split Read with Haiku): {onde}, nada foi delegado ao ajudante no Haiku. " + resto.replace(
             "fez o restante", "fez tudo")
     sem = r["se_fosse_no_principal"]
     ganho = 100 * (1 - a["custo"] / sem) if sem else 0
-    return (f"Observação do kit de tokens: {onde}, a leitura foi feita pelo ajudante no Haiku "
+    return (f"Observação (Split Read with Haiku): {onde}, a leitura foi feita pelo ajudante no Haiku "
             f"({a['n']} chamadas, {fmt(a['lidos'])} tokens, cerca de {dolar(a['custo'])}). Nos preços do {nome}, "
             f"os mesmos tokens custariam cerca de {dolar(sem)}: ganho de cerca de {ganho:.0f}%. " + resto +
             " Valores em preço de API, só para comparar.")
@@ -191,7 +191,7 @@ def lembrete():
         json.dump({"avisos": n}, open(arq, "w", encoding="utf-8"))
         if n == 1 or n % LEMBRETE_A_CADA == 0:
             return (' Não está ajudando? Diga "sem ajudante" para desligar nesta sessão, ou remova o kit com: '
-                    "bash ~/.claude/kit-economia-de-tokens/desinstalar.sh")
+                    "bash ~/.claude/split-read-with-haiku/desinstalar.sh")
     except Exception:
         pass
     return ""

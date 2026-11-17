@@ -77,10 +77,10 @@ A entrega é um plano com no máximo três mudanças. Cada uma diz onde clicar e
 
 O kit traz também um ajudante de leitura que roda no Haiku e um aviso com números ao fim de cada resposta. Os dois só existem no Claude Code. O ajudante tem apenas ferramentas de leitura e busca; o modelo da conversa não é alterado.
 
-- Para saber se estão instalados: `python3 ~/.claude/kit-economia-de-tokens/configurar.py estado`.
-- Quando a pessoa perguntar quanto o ajudante economizou: `python3 ~/.claude/kit-economia-de-tokens/resumo_do_pedido.py --sessao`. Sem `--sessao`, o resultado é o do último pedido.
+- Para saber se estão instalados: `python3 ~/.claude/split-read-with-haiku/configurar.py estado`.
+- Quando a pessoa perguntar quanto o ajudante economizou: `python3 ~/.claude/split-read-with-haiku/resumo_do_pedido.py --sessao`. Sem `--sessao`, o resultado é o do último pedido.
 - Quando a auditoria mostrar subagentes ou buscas pesando no modelo caro e o ajudante não estiver instalado, indique a instalação como correção. Diga o que ela muda (um arquivo de agente, um bloco no CLAUDE.md e um hook) e como remover.
-- Para remover: `bash ~/.claude/kit-economia-de-tokens/desinstalar.sh`.
+- Para remover: `bash ~/.claude/split-read-with-haiku/desinstalar.sh`.
 
 ## Formato da resposta
 

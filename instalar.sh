@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Instala o kit de economia de tokens no Claude Code (macOS e Linux).
+# Instala o Split Read with Haiku no Claude Code (macOS e Linux).
 #
 #   bash instalar.sh                 skill de auditoria + ajudante no Haiku + nota + aviso com números
 #   bash instalar.sh --sem-resumo    sem o aviso com números (não toca no settings.json)
 #   bash instalar.sh --so-auditoria  só a skill de auditoria
 #
-# Para remover depois: bash ~/.claude/kit-economia-de-tokens/desinstalar.sh
+# Para remover depois: bash ~/.claude/split-read-with-haiku/desinstalar.sh
 # No Windows: python ajudante-haiku\configurar.py instalar
 set -euo pipefail
 
